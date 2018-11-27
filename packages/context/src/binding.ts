@@ -423,6 +423,22 @@ export class Binding<T = BoundValue> {
     return this;
   }
 
+  /**
+   * Apply a template function to set up the binding with scope, tags.
+   *
+   * For example,
+   * ```ts
+   * const serverTemplate = (binding: Binding) =>
+   *   binding.inScope(BindingScope.SINGLETON).tag('server');
+   * binding.apply(serverTemplate);
+   * ```
+   * @param template A function to further configure the binding
+   */
+  apply(template: (binding: Binding<T>) => void): this {
+    template(this);
+    return this;
+  }
+
   toJSON(): Object {
     // tslint:disable-next-line:no-any
     const json: {[name: string]: any} = {

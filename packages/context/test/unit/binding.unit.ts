@@ -173,6 +173,16 @@ describe('Binding', () => {
     });
   });
 
+  describe('apply(templateFunction)', () => {
+    it('applies a template function', async () => {
+      binding.apply(b => {
+        b.inScope(BindingScope.SINGLETON).tag('myTag');
+      });
+      expect(binding.scope).to.eql(BindingScope.SINGLETON);
+      expect(binding.tagNames).to.eql(['myTag']);
+    });
+  });
+
   describe('toJSON()', () => {
     it('converts a keyed binding to plain JSON object', () => {
       const json = binding.toJSON();

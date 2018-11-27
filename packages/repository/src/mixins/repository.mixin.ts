@@ -181,9 +181,8 @@ export function RepositoryMixin<T extends Class<any>>(superClass: T) {
      * preserving data or rebuild everything from scratch.
      */
     async migrateSchema(options: SchemaMigrationOptions = {}): Promise<void> {
-      const operation = options.dropExistingSchema
-        ? 'automigrate'
-        : 'autoupdate';
+      const operation =
+        options.existingSchema === 'drop' ? 'automigrate' : 'autoupdate';
 
       // Instantiate all repositories to ensure models are registered & attached
       // to their datasources
@@ -201,7 +200,7 @@ export function RepositoryMixin<T extends Class<any>>(superClass: T) {
 
         if (operation in ds && typeof ds[operation] === 'function') {
           debug('Migrating dataSource %s', b.key);
-          await ds[operation]();
+          await ds[operation](options.models);
         } else {
           debug('Skipping migration of dataSource %s', b.key);
         }

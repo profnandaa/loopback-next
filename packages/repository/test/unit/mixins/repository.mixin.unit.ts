@@ -86,7 +86,7 @@ describe('RepositoryMixin', () => {
     it('calls autoupdate on registered datasources', async () => {
       app.dataSource(DataSourceStub);
 
-      await app.migrateSchema({dropExistingSchema: false});
+      await app.migrateSchema({existingSchema: 'alter'});
 
       sinon.assert.called(updateStub);
       sinon.assert.notCalled(migrateStub);
@@ -95,7 +95,7 @@ describe('RepositoryMixin', () => {
     it('calls automigrate on registered datasources', async () => {
       app.dataSource(DataSourceStub);
 
-      await app.migrateSchema({dropExistingSchema: true});
+      await app.migrateSchema({existingSchema: 'drop'});
 
       sinon.assert.called(migrateStub);
       sinon.assert.notCalled(updateStub);
@@ -115,7 +115,7 @@ describe('RepositoryMixin', () => {
         .tag('datasource')
         .inScope(BindingScope.SINGLETON);
 
-      await app.migrateSchema({dropExistingSchema: true});
+      await app.migrateSchema({existingSchema: 'drop'});
       // the test passes when migrateSchema() does not throw any error
     });
 
@@ -146,9 +146,18 @@ describe('RepositoryMixin', () => {
       }
       app.repository(ProductRepository);
 
-      await app.migrateSchema({dropExistingSchema: true});
+      await app.migrateSchema({existingSchema: 'drop'});
 
       expect(modelsMigrated).to.eql(['Product']);
+    });
+
+    it('migrates selected models only', async () => {
+      app.dataSource(DataSourceStub);
+
+      await app.migrateSchema({existingSchema: 'drop', models: ['Category']});
+
+      sinon.assert.calledWith(migrateStub, ['Category']);
+      sinon.assert.notCalled(updateStub);
     });
 
     function setupTestHelpers() {

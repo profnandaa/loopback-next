@@ -6,15 +6,12 @@
 import {TodoListApplication} from './application';
 
 export async function migrate(args: string[]) {
-  const dropExistingSchema = args.includes('--rebuild');
-  console.log(
-    'Migrating schemas (%s)',
-    dropExistingSchema ? 'rebuild' : 'update',
-  );
+  const existingSchema = args.includes('--rebuild') ? 'drop' : 'alter';
+  console.log('Migrating schemas (%s existing schema)', existingSchema);
 
   const app = new TodoListApplication();
   await app.boot();
-  await app.migrateSchema({dropExistingSchema});
+  await app.migrateSchema({existingSchema});
 
   // Connectors usually keep a pool of opened connections,
   // this keeps the process running even after all works is done.
